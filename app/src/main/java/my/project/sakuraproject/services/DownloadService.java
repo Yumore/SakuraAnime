@@ -29,7 +29,7 @@ public class DownloadService extends Service {
     private DownloadNotification mNotify;
 //    private Handler handler;
     PowerManager.WakeLock wakeLock = null;
-    private List<Long> taskIds = new ArrayList<>();
+    private final List<Long> taskIds = new ArrayList<>();
 
     @Nullable
     @Override
@@ -85,7 +85,7 @@ public class DownloadService extends Service {
 
     @Download.onTaskResume
     public void onTaskResume(DownloadTask downloadTask) {
-        mNotify.showDefaultNotification(new Long(downloadTask.getEntity().getId()).intValue(), (String) VideoUtils.getAnimeInfo(downloadTask, 0), downloadTask.getTaskName());
+        mNotify.showDefaultNotification(Long.valueOf(downloadTask.getEntity().getId()).intValue(), (String) VideoUtils.getAnimeInfo(downloadTask, 0), downloadTask.getTaskName());
 //        EventBus.getDefault().post(new Refresh(3));
     }
 
@@ -93,8 +93,8 @@ public class DownloadService extends Service {
     @Download.onTaskStart
     public void onTaskStart(DownloadTask downloadTask) {
         EventBus.getDefault().post(new Refresh(3));
-        taskIds.add(new Long(downloadTask.getEntity().getId()));
-        mNotify.showDefaultNotification(new Long(downloadTask.getEntity().getId()).intValue(), (String) VideoUtils.getAnimeInfo(downloadTask, 0), downloadTask.getTaskName());
+        taskIds.add(Long.valueOf(downloadTask.getEntity().getId()));
+        mNotify.showDefaultNotification(Long.valueOf(downloadTask.getEntity().getId()).intValue(), (String) VideoUtils.getAnimeInfo(downloadTask, 0), downloadTask.getTaskName());
     }
 
     @Download.onTaskStop
@@ -105,8 +105,8 @@ public class DownloadService extends Service {
 
     @Download.onTaskCancel
     public void onTaskCancel(DownloadTask downloadTask) {
-        taskIds.add(new Long(downloadTask.getEntity().getId()));
-        mNotify.cancelNotification(new Long(downloadTask.getEntity().getId()).intValue());
+        taskIds.add(Long.valueOf(downloadTask.getEntity().getId()));
+        mNotify.cancelNotification(Long.valueOf(downloadTask.getEntity().getId()).intValue());
 //        showInfo(downloadTask, "取消下载");
         shouldUnRegister();
     }
@@ -114,7 +114,7 @@ public class DownloadService extends Service {
     @Download.onTaskFail
     public void onTaskFail(DownloadTask downloadTask, Exception e) {
         String animeTitle = (String) VideoUtils.getAnimeInfo(downloadTask, 0);
-        mNotify.uploadInfo(new Long(downloadTask.getEntity().getId()).intValue(), animeTitle, downloadTask.getTaskName(), "下载失败 → " + (e == null ? "未知错误，或许是下载的资源不存在！" : e.getMessage()));
+        mNotify.uploadInfo(Long.valueOf(downloadTask.getEntity().getId()).intValue(), animeTitle, downloadTask.getTaskName(), "下载失败 → " + (e == null ? "未知错误，或许是下载的资源不存在！" : e.getMessage()));
         DatabaseUtil.updateDownloadError((String) VideoUtils.getAnimeInfo(downloadTask, 0), (Integer) VideoUtils.getAnimeInfo(downloadTask, 1), downloadTask.getFilePath(), downloadTask.getEntity().getId(), downloadTask.getFileSize());
 //        handler.post(() -> CustomToast.showToast(getApplicationContext(), VideoUtils.getAnimeInfo(downloadTask, 0) + " " + downloadTask.getTaskName() + "下载失败\n" +  ALog.getExceptionString(e), CustomToast.ERROR));
         shouldUnRegister();
@@ -123,7 +123,8 @@ public class DownloadService extends Service {
     @Download.onTaskComplete
     public void onTaskComplete(DownloadTask downloadTask) {
         String animeTitle = (String) VideoUtils.getAnimeInfo(downloadTask, 0);
-        mNotify.uploadInfo(new Long(downloadTask.getEntity().getId()).intValue(), animeTitle, downloadTask.getTaskName(), "下载成功");
+        mNotify.uploadInfo(Long.valueOf(downloadTask.getEntity().getId()).intValue(), animeTitle, downloadTask.getTaskName(), "下载成功");
+        taskIds.remove(downloadTask.getEntity().getId());
         DatabaseUtil.updateDownloadSuccess(animeTitle, (Integer) VideoUtils.getAnimeInfo(downloadTask, 1), downloadTask.getFilePath(), downloadTask.getEntity().getId(), downloadTask.getFileSize());
         Aria.download(this).load(downloadTask.getEntity().getId()).ignoreCheckPermissions().cancel(false); // 下载完成删除任务
         EventBus.getDefault().post(new DownloadEvent(animeTitle, downloadTask.getTaskName(), downloadTask.getFilePath(), downloadTask.getFileSize()));
@@ -132,7 +133,7 @@ public class DownloadService extends Service {
 
     @Download.onTaskRunning
     public void onTaskRunning(DownloadTask downloadTask) {
-        mNotify.upload(new Long(downloadTask.getEntity().getId()).intValue(), downloadTask.getPercent());
+        mNotify.upload(Long.valueOf(downloadTask.getEntity().getId()).intValue(), downloadTask.getPercent());
     }
 
     private void shouldUnRegister() {

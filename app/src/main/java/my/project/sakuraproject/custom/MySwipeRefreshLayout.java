@@ -7,11 +7,13 @@ import android.view.ViewConfiguration;
 
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-
+/**
+ * 解决SwipeRefreshLayout与NestedScrollView滑动冲突
+ */
 public class MySwipeRefreshLayout extends SwipeRefreshLayout {
     private float startX;
     private float startY;
-    private float mTouchSlop;
+    private final float mTouchSlop;
 
     public MySwipeRefreshLayout(Context context) {
         super(context);

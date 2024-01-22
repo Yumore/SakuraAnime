@@ -5,11 +5,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.core.view.GravityCompat;
+
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
-import androidx.core.view.GravityCompat;
 import my.project.sakuraproject.R;
 import my.project.sakuraproject.adapter.DramaAdapter;
 import my.project.sakuraproject.api.Api;
@@ -17,7 +18,6 @@ import my.project.sakuraproject.application.Sakura;
 import my.project.sakuraproject.bean.AnimeDescDetailsBean;
 import my.project.sakuraproject.bean.Event;
 import my.project.sakuraproject.custom.CustomToast;
-import my.project.sakuraproject.main.base.BaseModel;
 import my.project.sakuraproject.main.video.VideoContract;
 import my.project.sakuraproject.main.video.VideoPresenter;
 import my.project.sakuraproject.sniffing.SniffingUICallback;
@@ -35,7 +35,7 @@ public class PlayerActivity extends BasePlayerActivity implements VideoContract.
 
     @Override
     protected void setActivityName() {
-        Sakura.addDestoryActivity(this, "player");;
+        Sakura.addDestoryActivity(this, "player");
     }
 
     @Override

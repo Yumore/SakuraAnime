@@ -2,9 +2,15 @@ package my.project.sakuraproject.main.tag;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -17,10 +23,6 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
 import butterknife.OnClick;
 import my.project.sakuraproject.R;
@@ -50,8 +52,8 @@ public class TagActivity extends BaseActivity<TagContract.View, TagPresenter> im
     private String tagUrl = "";
     private String title = "";
     private String[] siliParams;
-    private List<String> siliTagParams = new ArrayList<>();
-    private List<String> siliTagSubTitle = new ArrayList<>();
+    private final List<String> siliTagParams = new ArrayList<>();
+    private final List<String> siliTagSubTitle = new ArrayList<>();
     private String toolbarSubTitle;
     private int nowPage = 1;
     private int pageCount = 1;
@@ -109,7 +111,10 @@ public class TagActivity extends BaseActivity<TagContract.View, TagPresenter> im
         toolbar.setTitle(title.isEmpty() ? Utils.getString(R.string.tag_title) : title);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(view -> finish());
+        toolbar.setNavigationOnClickListener(view -> {
+            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+            finish();
+        });
     }
 
     public void initSwipe() {

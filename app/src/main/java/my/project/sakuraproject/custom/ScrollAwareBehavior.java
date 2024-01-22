@@ -18,6 +18,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import my.project.sakuraproject.R;
 
+/**
+ * 列表滑动显示/隐藏浮动按钮
+ */
 public class ScrollAwareBehavior extends FloatingActionButton.Behavior {
     private static final Interpolator INTERPOLATOR = new FastOutSlowInInterpolator();
     private boolean mIsAnimatingOut = false;
@@ -54,20 +57,20 @@ public class ScrollAwareBehavior extends FloatingActionButton.Behavior {
     private void animateOut(final FloatingActionButton button) {
         if (Build.VERSION.SDK_INT >= 14) {
             ViewCompat.animate(button).scaleX(0.0F).scaleY(0.0F).alpha(0.0F).setInterpolator(INTERPOLATOR).withLayer()
-                    .setListener(new ViewPropertyAnimatorListener() {
-                        public void onAnimationStart(View view) {
-                            ScrollAwareBehavior.this.mIsAnimatingOut = true;
-                        }
+                .setListener(new ViewPropertyAnimatorListener() {
+                    public void onAnimationStart(View view) {
+                        ScrollAwareBehavior.this.mIsAnimatingOut = true;
+                    }
 
-                        public void onAnimationCancel(View view) {
-                            ScrollAwareBehavior.this.mIsAnimatingOut = false;
-                        }
+                    public void onAnimationCancel(View view) {
+                        ScrollAwareBehavior.this.mIsAnimatingOut = false;
+                    }
 
-                        public void onAnimationEnd(View view) {
-                            ScrollAwareBehavior.this.mIsAnimatingOut = false;
-                            view.setVisibility(View.INVISIBLE);
-                        }
-                    }).start();
+                    public void onAnimationEnd(View view) {
+                        ScrollAwareBehavior.this.mIsAnimatingOut = false;
+                        view.setVisibility(View.INVISIBLE);
+                    }
+                }).start();
 
         } else {
             Animation anim = AnimationUtils.loadAnimation(button.getContext(), R.anim.fab_in);
@@ -99,8 +102,8 @@ public class ScrollAwareBehavior extends FloatingActionButton.Behavior {
 
         if (Build.VERSION.SDK_INT >= 14) {
             ViewCompat.animate(button).scaleX(1.0F).scaleY(1.0F).alpha(1.0F)
-                    .setInterpolator(INTERPOLATOR).withLayer().setListener(null)
-                    .start();
+                .setInterpolator(INTERPOLATOR).withLayer().setListener(null)
+                .start();
 
         } else {
             Animation anim = AnimationUtils.loadAnimation(button.getContext(), R.anim.fab_out);

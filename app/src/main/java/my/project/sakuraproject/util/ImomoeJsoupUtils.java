@@ -15,13 +15,11 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -98,12 +96,12 @@ public class ImomoeJsoupUtils {
         homeBean = new HomeBean();
         if (Utils.isPad()) {
             // 平板不显示banner轮播
-            homeBean.setTitle("动漫推荐");
+            homeBean.setTitle("热门推荐");
             homeBean.setMoreUrl("");
             homeBean.setDataType(HomeAdapter.TYPE_LEVEL_2);
         } else
             homeBean.setDataType(HomeAdapter.TYPE_LEVEL_1);
-        List<HomeBean.HomeItemBean> recommendItemBeanList = new ArrayList<>();
+        List<HomeBean.HomeItemBean> hotRecommendItemBeanList = new ArrayList<>();
         for (Element recommend : recommendLi) {
             HomeBean.HomeItemBean homeItemBean = new HomeBean.HomeItemBean();
             String animeTitle = recommend.select("div.swiper-slide-votitle").text();
@@ -122,9 +120,9 @@ public class ImomoeJsoupUtils {
             homeItemBean.setUrl(url);
             homeItemBean.setImg(img);
             homeItemBean.setEpisodes(episodes);
-            recommendItemBeanList.add(homeItemBean);
+            hotRecommendItemBeanList.add(homeItemBean);
         }
-        homeBean.setData(recommendItemBeanList);
+        homeBean.setData(hotRecommendItemBeanList);
         homeBeanList.add(homeBean);
         // 今日热门
         Elements hotTodayLi = document.select("div.index_slide_r > div.sliderlist > div.sliderli");
@@ -147,6 +145,34 @@ public class ImomoeJsoupUtils {
         }
         homeBean.setData(hotTodayItemBeanList);
         homeBeanList.add(homeBean);
+        // 站内推荐
+        Elements recommendLeftList = document.select("div.illust-list-left > div.list-left-img-box > a");
+        Elements recommendRightList = document.select("div.illust-list-right > div.list-right-img-box > div.list-box > a");
+        Elements recommendList = new Elements();
+        recommendList.addAll(recommendLeftList);
+        recommendList.addAll(recommendRightList);
+        Log.e("recommendList size", String.valueOf(recommendList.size()));
+        if (recommendList.size() > 0) {
+            homeBean = new HomeBean();
+            homeBean.setTitle("站内推荐");
+            homeBean.setMoreUrl("");
+            homeBean.setDataType(HomeAdapter.TYPE_LEVEL_2);
+            List<HomeBean.HomeItemBean> recommendItemBeanList = new ArrayList<>();
+            for (Element a : recommendList) {
+                if (!a.attr("href").contains("voddetail")) continue;
+                HomeBean.HomeItemBean homeItemBean = new HomeBean.HomeItemBean();
+                String animeTitle = a.select("span").text();
+                String url = a.attr("href");
+                String imgSrc = a.select("img").attr("src");
+                String img = getImg(imgSrc.isEmpty() ? a.select("img").attr("data-url") : imgSrc);
+                homeItemBean.setTitle(animeTitle);
+                homeItemBean.setUrl(url);
+                homeItemBean.setImg(img);
+                recommendItemBeanList.add(homeItemBean);
+            }
+            homeBean.setData(recommendItemBeanList);
+            homeBeanList.add(homeBean);
+        }
         // 更新动态
         Elements updateLi = document.select("article.article");
         updateLi.select("span.arc_v2").remove();
@@ -159,7 +185,7 @@ public class ImomoeJsoupUtils {
             HomeBean.HomeItemBean homeItemBean = new HomeBean.HomeItemBean();
             String animeTitle = update.select("h2.entry-title").text();
             String url = update.select("h2.entry-title > a").attr("href");
-            String img = update.select("img.scrollLoading").attr("data-url");
+            String img = update.select("img.scrollLoading").attr("src");
             String episodes = update.select("div.entry-meta").text();
             homeItemBean.setTitle(animeTitle);
             homeItemBean.setUrl(url);
@@ -187,7 +213,7 @@ public class ImomoeJsoupUtils {
                 weekObj.put(TABS[i], setWeekJsonArray(weekElements.get(i).select("li")));
             }
             Log.e("week", weekObj.toString());
-            homeMap.put("success", weekObj.length() > 0 ? true : false);
+            homeMap.put("success", weekObj.length() > 0);
             homeMap.put("week", weekObj);
         }
         else
@@ -371,9 +397,10 @@ public class ImomoeJsoupUtils {
     /**
      * 获取番剧播放列表、推荐列表
      * 2022年6月29日20:40:53 修改
+     *
      * @param source
      * @param dramaStr
-     * @return 如果没有播放列表则返回null
+     * @return 如果没有播放列表则返回空对象
      */
     public static AnimeDescListBean getAnimeDescList(String source, String dramaStr) {
         AnimeDescListBean animeDescListBean = new AnimeDescListBean();
@@ -407,6 +434,8 @@ public class ImomoeJsoupUtils {
                 animeDramasBean.setAnimeDescDetailsBeanList(animeDescDramasBeans);
                 animeDramasBeans.add(animeDramasBean);
             }
+            if (animeDramasBeans.size() == 0)
+                return animeDescListBean;
             animeDescListBean.setAnimeDramasBeans(animeDramasBeans);
             //** 封装推荐 **//
             Elements recommendElements = document.select("div.vod_hl_list").select("a"); //相关推荐
@@ -422,7 +451,7 @@ public class ImomoeJsoupUtils {
             }
             return animeDescListBean;
         } else
-            return null;
+            return animeDescListBean;
     }
     /**************************************  动漫详情解析方法结束  **************************************/
 

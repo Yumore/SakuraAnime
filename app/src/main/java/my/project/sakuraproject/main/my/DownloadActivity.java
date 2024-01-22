@@ -4,16 +4,22 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.appcompat.widget.PopupMenu;
+import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.m3u8.M3U8VodOption;
 import com.arialyy.aria.core.task.DownloadTask;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -22,12 +28,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.PopupMenu;
-import androidx.appcompat.widget.Toolbar;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import my.project.sakuraproject.R;
 import my.project.sakuraproject.adapter.DownloadListAdapter;
@@ -52,7 +52,7 @@ public class DownloadActivity extends BaseActivity<DownloadContract.View, Downlo
     @BindView(R.id.loading)
     ProgressBar loading;
     CoordinatorLayout msg;
-    private int limit = 10;
+    private final int limit = 10;
     private int downloadCount = 0;
     private boolean isMain = true;
     protected boolean isErr = true;
@@ -103,7 +103,7 @@ public class DownloadActivity extends BaseActivity<DownloadContract.View, Downlo
         if (list != null && list.size() > 0) {
             Utils.showAlert(this,
                     "下载任务操作",
-                    String.format("你有%s个未完成的下载任务，是否继续下载？", list.size()+""),
+                    String.format("你有%s个未完成的下载任务，是否继续下载？", String.valueOf(list.size())),
                     false,
                     Utils.getString(R.string.download_positive),
                     Utils.getString(R.string.download_negative),
@@ -140,7 +140,10 @@ public class DownloadActivity extends BaseActivity<DownloadContract.View, Downlo
         toolbar.setTitle("下载列表");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(view -> finish());
+        toolbar.setNavigationOnClickListener(view -> {
+            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+            finish();
+        });
     }
 
     private void initAdapter() {
@@ -158,13 +161,11 @@ public class DownloadActivity extends BaseActivity<DownloadContract.View, Downlo
             final PopupMenu popupMenu = new PopupMenu(this, v);
             popupMenu.getMenuInflater().inflate(R.menu.download_menu, popupMenu.getMenu());
             popupMenu.setOnMenuItemClickListener(menuItem -> {
-                switch (menuItem.getItemId()) {
-                    case R.id.go_to_desc:
-                        Bundle bundle = new Bundle();
-                        bundle.putString("name", downloadList.get(position).getAnimeTitle());
-                        bundle.putString("url", downloadList.get(position).getDescUrl());
-                        startActivity(new Intent(this, DescActivity.class).putExtras(bundle));
-                        break;
+                if (menuItem.getItemId() == R.id.go_to_desc) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("name", downloadList.get(position).getAnimeTitle());
+                    bundle.putString("url", downloadList.get(position).getDescUrl());
+                    startActivity(new Intent(this, DescActivity.class).putExtras(bundle));
                 }
                 return true;
             });

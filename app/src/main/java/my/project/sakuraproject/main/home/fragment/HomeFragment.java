@@ -2,10 +2,12 @@ package my.project.sakuraproject.main.home.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.entity.MultiItemEntity;
@@ -87,6 +89,7 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
             multiItemEntities.clear();
             adapter.setNewData(multiItemEntities);
         });
+
     }
 
     private void initAdapter() {
@@ -94,12 +97,10 @@ public class HomeFragment extends BaseFragment<HomeContract.View, HomePresenter>
         adapter = new HomeAdapter(getActivity(), multiItemEntities, this);
         adapter.openLoadAnimation(BaseQuickAdapter.ALPHAIN);
         adapter.setOnItemChildClickListener((adapter, view, position) -> {
-            switch (adapter.getItemViewType(position)) {
-                case HomeAdapter.TYPE_LEVEL_2:
-                    HomeBean homeBean = (HomeBean) adapter.getData().get(position);
-                    if (homeBean.getMoreUrl().isEmpty()) return;
-                    onMoreClick(homeBean.getTitle(), homeBean.getMoreUrl());
-                    break;
+            if (adapter.getItemViewType(position) == HomeAdapter.TYPE_LEVEL_2) {
+                HomeBean homeBean = (HomeBean) adapter.getData().get(position);
+                if (homeBean.getMoreUrl().isEmpty()) return;
+                onMoreClick(homeBean.getTitle(), homeBean.getMoreUrl());
             }
         });
         recyclerView.setAdapter(adapter);

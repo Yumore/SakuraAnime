@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Handler;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatDelegate;
 
@@ -30,7 +31,7 @@ import my.project.sakuraproject.util.Utils;
 public class Sakura extends Application {
     private static Sakura appContext;
     private List<Activity> oList;
-    private static Map<String, Activity> destoryMap = new HashMap<>();
+    private static final Map<String, Activity> destoryMap = new HashMap<>();
     public static String DOMAIN;
     public static String TAG_API, JCB_API, SEARCH_API, MOVIE_API;
     public static String YHDM_ZT_API = "/topic/";
@@ -93,22 +94,26 @@ public class Sakura extends Application {
         isImomoe = Utils.isImomoe();
         DOMAIN = isImomoe ? (String) SharedPreferencesUtils.getParam(appContext, "imomoe_domain", Utils.getString(R.string.imomoe_url)) : (String) SharedPreferencesUtils.getParam(appContext, "domain", Utils.getString(R.string.domain_url));
         TAG_API = DOMAIN + "/sitemap";
-        JCB_API =  "/37/";
+        JCB_API = "/37/";
         SEARCH_API = isImomoe ? DOMAIN : DOMAIN + "/search/";
         MOVIE_API = "/movie/";
         YHDM_UPDATE = String.format("%s/new/", SharedPreferencesUtils.getParam(appContext, "domain", Utils.getString(R.string.domain_url)));
+    }
+
+    public void showToastMsg(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
     public void showSnackbarMsgAction(View view, String msg, String actionMsg, View.OnClickListener listener) {
         Snackbar.make(view, msg, Snackbar.LENGTH_LONG).setAction(actionMsg, listener).show();
     }
 
-    public void showSnackbarMsg(View view, String msg, View anchorView) {
+    /*public void showSnackbarMsg(View view, String msg, View anchorView) {
         Snackbar snackbar = Snackbar.make(view, msg, Snackbar.LENGTH_LONG);
         snackbar.setAnchorView(anchorView);
         snackbar.getView().setBackgroundColor(getResources().getColor(R.color.colorAccent));
         snackbar.show();
-    }
+    }*/
 
     public void addActivity(Activity activity) {
         if (!oList.contains(activity)) {

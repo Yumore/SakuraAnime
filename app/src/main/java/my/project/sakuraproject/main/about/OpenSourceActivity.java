@@ -1,13 +1,16 @@
 package my.project.sakuraproject.main.about;
 
-import com.chad.library.adapter.base.BaseQuickAdapter;
-
-import java.util.List;
+import android.view.HapticFeedbackConstants;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.chad.library.adapter.base.BaseQuickAdapter;
+
+import java.util.List;
+
 import butterknife.BindView;
 import my.project.sakuraproject.R;
 import my.project.sakuraproject.adapter.SourceAdapter;
@@ -25,7 +28,7 @@ public class OpenSourceActivity extends BaseActivity {
     @BindView(R.id.rv_list)
     RecyclerView recyclerView;
     private SourceAdapter adapter;
-    private List<SourceBean> list = OpenSourceEnum.getSourceList();
+    private final List<SourceBean> list = OpenSourceEnum.getSourceList();
 
     @Override
     protected Presenter createPresenter() {
@@ -64,7 +67,10 @@ public class OpenSourceActivity extends BaseActivity {
         toolbar.setTitle(Utils.getString(R.string.os_title));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(view -> supportFinishAfterTransition());
+        toolbar.setNavigationOnClickListener(view -> {
+            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+            finish();
+        });
     }
 
     public void initSwipe() {

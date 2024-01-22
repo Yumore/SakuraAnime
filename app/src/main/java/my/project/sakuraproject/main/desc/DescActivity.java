@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -15,6 +16,16 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.core.widget.NestedScrollView;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.m3u8.M3U8VodOption;
@@ -42,15 +53,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.AppCompatTextView;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
-import androidx.core.widget.NestedScrollView;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
 import butterknife.OnClick;
 import jp.wasabeef.glide.transformations.BlurTransformation;
@@ -134,7 +136,7 @@ public class DescActivity extends BaseActivity<DescContract.View, DescPresenter>
     /**
      * 记住点击过的番剧 用于手势返回时回到上以番剧信息
      */
-    private List<String> animeUrlList = new ArrayList();
+    private final List<String> animeUrlList = new ArrayList();
     /**
      * 包含 播放列表、多季、相关推荐
      */
@@ -298,7 +300,10 @@ public class DescActivity extends BaseActivity<DescContract.View, DescPresenter>
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(view -> finish());
+        toolbar.setNavigationOnClickListener(view -> {
+            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+            finish();
+        });
     }
 
     @OnClick({R.id.order, R.id.favorite, R.id.download, R.id.browser})
@@ -399,7 +404,8 @@ public class DescActivity extends BaseActivity<DescContract.View, DescPresenter>
         downloadAdapter.setOnItemClickListener((adapter, view, position) -> {
             DownloadDramaBean bean = downloadBean.get(position);
             if (bean.isHasDownload()) {
-                CustomToast.showToast(this, "已存在下载任务，请勿重复执行！", CustomToast.WARNING);
+//                CustomToast.showToast(this, "已存在下载任务，请勿重复执行！", CustomToast.WARNING);
+                application.showToastMsg("已存在下载任务，请勿重复执行！");
                 return;
             }
             // 下载开始
@@ -426,7 +432,7 @@ public class DescActivity extends BaseActivity<DescContract.View, DescPresenter>
         if (!isImomoe) {
             bundle.putString("title", animeListBean.getTagTitles().get(position));
             bundle.putString("url", animeListBean.getTagUrls().get(position));
-            bundle.putBoolean("isMovie", animeListBean.getTagUrls().get(position).contains("movie") ? true : false);
+            bundle.putBoolean("isMovie", animeListBean.getTagUrls().get(position).contains("movie"));
             startActivity(new Intent(DescActivity.this, AnimeListActivity.class).putExtras(bundle));
         }
         else {
@@ -515,7 +521,8 @@ public class DescActivity extends BaseActivity<DescContract.View, DescPresenter>
         isFavorite = DatabaseUtil.favorite(animeListBean, animeId);
         favoriteBtn.setIcon(ContextCompat.getDrawable(this, isFavorite ? R.drawable.baseline_favorite_white_48dp : R.drawable.baseline_favorite_border_white_48dp));
         favoriteBtn.setText(isFavorite ? Utils.getString(R.string.has_favorite) : Utils.getString(R.string.favorite));
-        application.showSnackbarMsg(favoriteBtn, isFavorite ? Utils.getString(R.string.join_ok) : Utils.getString(R.string.join_error), playLinearLayout);
+//        application.showSnackbarMsg(favoriteBtn, isFavorite ? Utils.getString(R.string.join_ok) : Utils.getString(R.string.join_error), playLinearLayout);
+        CustomToast.showToast(this, isFavorite ? Utils.getString(R.string.join_ok) : Utils.getString(R.string.join_error), CustomToast.DEFAULT);
         EventBus.getDefault().post(new Refresh(1));
     }
 

@@ -1,6 +1,5 @@
 package my.project.sakuraproject.main.home;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,6 +7,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.entity.MultiItemEntity;
@@ -23,12 +29,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
 import my.project.sakuraproject.R;
 import my.project.sakuraproject.adapter.HomeAdapter;
@@ -71,7 +71,7 @@ public class HomeActivity extends BaseActivity<HomeContract.View, HomePresenter>
     private ImageView themeImageView;
     private long exitTime = 0;
     private boolean isChangingTheme = false;
-    private String[] sourceItems = Utils.getArray(R.array.source);
+    private final String[] sourceItems = Utils.getArray(R.array.source);
     private List<HomeHeaderBean.HeaderDataBean> headerDataBeans;
     List<MultiItemEntity> multiItemEntities = new ArrayList<>();
     @BindView(R.id.rv_list)
@@ -181,12 +181,10 @@ public class HomeActivity extends BaseActivity<HomeContract.View, HomePresenter>
         adapter = new HomeAdapter(this, multiItemEntities, this);
         adapter.openLoadAnimation(BaseQuickAdapter.SCALEIN);
         adapter.setOnItemChildClickListener((adapter, view, position) -> {
-            switch (adapter.getItemViewType(position)) {
-                case HomeAdapter.TYPE_LEVEL_1:
-                    HomeBean homeBean = (HomeBean) adapter.getData().get(position);
-                    if (homeBean.getMoreUrl().isEmpty()) return;
-                    onMoreClick(homeBean.getTitle(), homeBean.getMoreUrl());
-                    break;
+            if (adapter.getItemViewType(position) == HomeAdapter.TYPE_LEVEL_1) {
+                HomeBean homeBean = (HomeBean) adapter.getData().get(position);
+                if (homeBean.getMoreUrl().isEmpty()) return;
+                onMoreClick(homeBean.getTitle(), homeBean.getMoreUrl());
             }
         });
         recyclerView.setAdapter(adapter);

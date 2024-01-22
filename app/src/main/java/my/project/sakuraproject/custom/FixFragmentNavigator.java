@@ -21,6 +21,9 @@ import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 解决Navigation重复创建
+ */
 @Navigator.Name("fixFragment")
 public class FixFragmentNavigator extends FragmentNavigator {
     private final String TAG = "ReLoadFragmentNavictor";
@@ -41,7 +44,7 @@ public class FixFragmentNavigator extends FragmentNavigator {
 
         if (mFragmentManager.isStateSaved()) {
             Log.i(TAG, "Ignoring navigate() call: FragmentManager has already"
-                    + " saved its state");
+                + " saved its state");
             return null;
         }
         String className = destination.getClassName();
@@ -95,8 +98,8 @@ public class FixFragmentNavigator extends FragmentNavigator {
 
         final boolean initialNavigation = mBackStack.isEmpty();
         final boolean isSingleTopReplacement = navOptions != null && !initialNavigation
-                && navOptions.shouldLaunchSingleTop()
-                && mBackStack.peekLast() == destId;
+            && navOptions.shouldLaunchSingleTop()
+            && mBackStack.peekLast() == destId;
 
         boolean isAdded;
         if (initialNavigation) {
@@ -104,8 +107,8 @@ public class FixFragmentNavigator extends FragmentNavigator {
         } else if (isSingleTopReplacement) {
             if (mBackStack.size() > 1) {
                 mFragmentManager.popBackStack(
-                        generateBackStackName(mBackStack.size(), mBackStack.peekLast()),
-                        FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    generateBackStackName(mBackStack.size(), mBackStack.peekLast()),
+                    FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 ft.addToBackStack(generateBackStackName(mBackStack.size(), destId));
             }
             isAdded = false;
@@ -128,6 +131,7 @@ public class FixFragmentNavigator extends FragmentNavigator {
             return null;
         }
     }
+
     //navigate需要打方法重复类直接复制过来就可以
     @NonNull
     private String generateBackStackName(int backStackIndex, int destId) {

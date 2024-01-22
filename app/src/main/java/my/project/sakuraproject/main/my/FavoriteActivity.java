@@ -2,8 +2,15 @@ package my.project.sakuraproject.main.my;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.widget.ProgressBar;
+
+import androidx.appcompat.widget.PopupMenu;
+import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -12,11 +19,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.appcompat.widget.PopupMenu;
-import androidx.appcompat.widget.Toolbar;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import my.project.sakuraproject.R;
 import my.project.sakuraproject.adapter.FavoriteListAdapter;
@@ -41,7 +43,7 @@ public class FavoriteActivity extends BaseActivity<FavoriteContract.View, Favori
     CoordinatorLayout msg;
     private FavoriteListAdapter adapter;
     private List<AnimeListBean> favoriteList = new ArrayList<>();
-    private int limit = 10;
+    private final int limit = 10;
     private int favoriteCount = 0;
     private boolean isMain = true;
     protected boolean isErr = true;
@@ -75,7 +77,10 @@ public class FavoriteActivity extends BaseActivity<FavoriteContract.View, Favori
         toolbar.setTitle(Utils.getString(R.string.favorite_title));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(view -> finish());
+        toolbar.setNavigationOnClickListener(view -> {
+            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+            finish();
+        });
     }
 
     private void initAdapter() {
@@ -94,10 +99,8 @@ public class FavoriteActivity extends BaseActivity<FavoriteContract.View, Favori
             final PopupMenu popupMenu = new PopupMenu(this, v);
             popupMenu.getMenuInflater().inflate(R.menu.favorite_menu, popupMenu.getMenu());
             popupMenu.setOnMenuItemClickListener(menuItem -> {
-                switch (menuItem.getItemId()) {
-                    case R.id.remove_favorite:
-                        removeFavorite(position);
-                        break;
+                if (menuItem.getItemId() == R.id.remove_favorite) {
+                    removeFavorite(position);
                 }
                 return true;
             });

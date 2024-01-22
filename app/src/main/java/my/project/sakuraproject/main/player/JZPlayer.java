@@ -1,5 +1,6 @@
 package my.project.sakuraproject.main.player;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -16,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
+
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
@@ -23,7 +26,6 @@ import com.google.android.material.textfield.TextInputLayout;
 import java.io.IOException;
 import java.util.HashMap;
 
-import androidx.appcompat.app.AlertDialog;
 import cn.jzvd.JZDataSource;
 import cn.jzvd.JZUtils;
 import cn.jzvd.Jzvd;
@@ -45,6 +47,7 @@ import my.project.sakuraproject.util.Utils;
 
 public class JZPlayer extends JzvdStd {
     float starX, startY;
+    private Activity activity;
     private Context context;
     private CompleteListener listener;
     private TouchListener touchListener;
@@ -76,7 +79,7 @@ public class JZPlayer extends JzvdStd {
     public String queryDanmuTitle = "";
     public boolean open_danmu = true;
     public boolean loadError = false;
-    private String[] speeds = {"0.5x","1.0x", "1.25x", "1.5x", "1.75x", "2.0x", "2.5x", "3.0x"};
+    private final String[] speeds = {"0.5x","1.0x", "1.25x", "1.5x", "1.75x", "2.0x", "2.5x", "3.0x"};
 
     public JZPlayer(Context context) { super(context); }
 
@@ -84,10 +87,11 @@ public class JZPlayer extends JzvdStd {
         super(context, attrs);
     }
 
-    public void setListener(Context context, CompleteListener listener,
+    public void setListener(Activity activity, Context context, CompleteListener listener,
                             TouchListener touchListener, ShowOrHideChangeViewListener showOrHideChangeViewListener,
                             OnProgressListener onProgressListener, PlayingListener playingListener, PauseListener pauseListener,
                             OnQueryDanmuListener onQueryDanmuListener) {
+        this.activity = activity;
         this.context = context;
         this.listener = listener;
         this.touchListener = touchListener;
@@ -200,13 +204,13 @@ public class JZPlayer extends JzvdStd {
                     changeUiToPlayingShow();
                     leftBLock.setImageResource(R.drawable.player_btn_locking);
                     rightBlock.setImageResource(R.drawable.player_btn_locking);
-                    CustomToast.showToast(context, "屏幕锁定关闭", CustomToast.SUCCESS);
+                    CustomToast.showToast(activity, "屏幕锁定关闭", CustomToast.SUCCESS);
                 } else {
                     // 上锁
                     changeUiToPlayingClear();
                     leftBLock.setImageResource(R.drawable.player_btn_locking_pre);
                     rightBlock.setImageResource(R.drawable.player_btn_locking_pre);
-                    CustomToast.showToast(context, "屏幕锁定开启", CustomToast.SUCCESS);
+                    CustomToast.showToast(activity, "屏幕锁定开启", CustomToast.SUCCESS);
 //                    Drawable up = ContextCompat.getDrawable(context,R.drawable.player_btn_locking_pre);
 //                    Drawable drawableUp= DrawableCompat.wrap(up);
 //                    DrawableCompat.setTint(drawableUp, ContextCompat.getColor(context,R.color.colorAccent));
@@ -243,7 +247,7 @@ public class JZPlayer extends JzvdStd {
                 break;
             case R.id.airplay:
                 if (!Utils.isWifi(context)) {
-                    CustomToast.showToast(context, "投屏需要连接Wifi，确保与投屏设备网络环境一致~", CustomToast.WARNING);
+                    CustomToast.showToast(activity, "投屏需要连接Wifi，确保与投屏设备网络环境一致~", CustomToast.ERROR);
                     return;
                 }
                 if (isLocalVideo) {
@@ -319,11 +323,7 @@ public class JZPlayer extends JzvdStd {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (alertDialog == null) return;
-                if (s.length() == 0) {
-                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-                } else {
-                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
-                }
+                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(s.length() != 0);
                 textInputLayout.setError(null);
             }
 

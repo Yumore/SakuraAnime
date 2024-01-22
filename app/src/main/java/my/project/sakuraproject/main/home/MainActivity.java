@@ -7,12 +7,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -24,6 +18,13 @@ import androidx.navigation.fragment.FragmentNavigator;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import butterknife.BindView;
 import my.project.sakuraproject.R;
 import my.project.sakuraproject.application.Sakura;
@@ -122,7 +123,7 @@ public class MainActivity extends BaseActivity {
             toolbar.setNavigationIcon(null);
             switch (destination.getId()) {
                 case R.id.home:
-                    toolbar.setTitle(getString(R.string.app_name));
+                    toolbar.setTitle(getString(R.string.main_title));
                     toolbar.setSubtitle(Utils.isImomoe() ? getResources().getString(R.string.imomoe) : getResources().getString(R.string.yhdm));
                     break;
                 case R.id.my:
@@ -154,10 +155,8 @@ public class MainActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
-        switch (item.getItemId()) {
-            case R.id.search:
-                startActivity(new Intent(getApplicationContext(), SearchActivity.class));
-                break;
+        if (item.getItemId() == R.id.search) {
+            startActivity(new Intent(getApplicationContext(), SearchActivity.class));
         }
         return true;
     }

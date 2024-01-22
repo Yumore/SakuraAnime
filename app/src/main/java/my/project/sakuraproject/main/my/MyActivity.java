@@ -1,8 +1,13 @@
 package my.project.sakuraproject.main.my;
 
+import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+
+import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
@@ -13,9 +18,6 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
-import androidx.appcompat.widget.Toolbar;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import my.project.sakuraproject.R;
 import my.project.sakuraproject.adapter.MyFragmentAdapter;
@@ -39,7 +41,7 @@ public class MyActivity extends BaseActivity implements ViewPager.OnPageChangeLi
     @BindView(R.id.viewpager)
     ViewPager viewpager;
     private MyFragmentAdapter myFragmentAdapter;
-    private String[] tabTitleArr = Utils.getArray(R.array.my_titles);
+    private final String[] tabTitleArr = Utils.getArray(R.array.my_titles);
     @BindView(R.id.msg)
     CoordinatorLayout msg;
 //    private SlidrInterface slidrInterface;
@@ -73,7 +75,10 @@ public class MyActivity extends BaseActivity implements ViewPager.OnPageChangeLi
         toolbar.setTitle(getResources().getString(R.string.my_title));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(view -> finish());
+        toolbar.setNavigationOnClickListener(view -> {
+            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+            finish();
+        });
     }
 
     public void initFab() {
@@ -117,17 +122,14 @@ public class MyActivity extends BaseActivity implements ViewPager.OnPageChangeLi
     @Override
     public void onPageSelected(int position) {
 //        enableSliding(position == 0);
-        switch (position) {
-            case 1:
-                if (!fab.isShown()) {
-                    fab.setVisibility(View.VISIBLE);
-                    fab.setAnimation(AnimationUtils.loadAnimation(this, R.anim.my_fab_in));
-                }
-                break;
-            default:
-                fab.setVisibility(View.GONE);
-                fab.setAnimation(AnimationUtils.loadAnimation(this, R.anim.my_fab_out));
-                break;
+        if (position == 1) {
+            if (!fab.isShown()) {
+                fab.setVisibility(View.VISIBLE);
+                fab.setAnimation(AnimationUtils.loadAnimation(this, R.anim.my_fab_in));
+            }
+        } else {
+            fab.setVisibility(View.GONE);
+            fab.setAnimation(AnimationUtils.loadAnimation(this, R.anim.my_fab_out));
         }
     }
 

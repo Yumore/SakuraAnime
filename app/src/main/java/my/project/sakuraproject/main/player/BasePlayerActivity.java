@@ -1,7 +1,6 @@
 package my.project.sakuraproject.main.player;
 
 import android.app.PictureInPictureParams;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -16,10 +15,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import org.greenrobot.eventbus.EventBus;
@@ -32,13 +38,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.OnClick;
 import cn.jzvd.JZUtils;
@@ -60,7 +59,6 @@ import my.project.sakuraproject.custom.CustomDanmakuParser;
 import my.project.sakuraproject.custom.CustomToast;
 import my.project.sakuraproject.database.DatabaseUtil;
 import my.project.sakuraproject.main.base.BaseActivity;
-import my.project.sakuraproject.main.base.BaseModel;
 import my.project.sakuraproject.main.base.Presenter;
 import my.project.sakuraproject.main.video.DanmuContract;
 import my.project.sakuraproject.main.video.DanmuPresenter;
@@ -156,9 +154,12 @@ public abstract class BasePlayerActivity extends BaseActivity implements JZPlaye
         Bundle bundle = getIntent().getExtras();
         setBundleData(bundle);
         //禁止冒泡
-        player.setOnClickListener(view -> {return;});
-        linearLayout.setOnClickListener(view -> {return;});
-        navConfigView.setOnClickListener(view -> {return;});
+        player.setOnClickListener(view -> {
+        });
+        linearLayout.setOnClickListener(view -> {
+        });
+        navConfigView.setOnClickListener(view -> {
+        });
         initCustomData();
         initAdapter();
         initPlayerPreNextTag();
@@ -180,11 +181,11 @@ public abstract class BasePlayerActivity extends BaseActivity implements JZPlaye
             public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {}
             @Override
             public void onDrawerOpened(@NonNull View drawerView) {
-                if (drawerLayout.isDrawerOpen(GravityCompat.START)) player.goOnPlayOnPause();
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) Jzvd.goOnPlayOnPause();
             }
             @Override
             public void onDrawerClosed(@NonNull View drawerView) {
-                if (!drawerLayout.isDrawerOpen(GravityCompat.START)) player.goOnPlayOnResume();
+                if (!drawerLayout.isDrawerOpen(GravityCompat.START)) Jzvd.goOnPlayOnResume();
             }
             @Override
             public void onDrawerStateChanged(int newState) {}
@@ -209,8 +210,8 @@ public abstract class BasePlayerActivity extends BaseActivity implements JZPlaye
                 drawerLayout.closeDrawer(GravityCompat.END);
             else drawerLayout.openDrawer(GravityCompat.END);
         });
-        player.setListener(this, this, this, this, this, this, this, this);
-        player.WIFI_TIP_DIALOG_SHOWED = true;
+        player.setListener(this, this, this, this, this, this, this, this, this);
+        Jzvd.WIFI_TIP_DIALOG_SHOWED = true;
         player.backButton.setOnClickListener(v -> finish());
         player.preVideo.setOnClickListener(v -> {
             clickIndex--;
@@ -430,7 +431,7 @@ public abstract class BasePlayerActivity extends BaseActivity implements JZPlaye
 //        player.setUp(Uri.fromFile(new File(path)).toString(), animeTitle + " - " + dramaTitle, Jzvd.SCREEN_FULLSCREEN, JZExoPlayer.class);
         String playPath = Uri.fromFile(new File(path)).toString();
         try {
-            playPath = URLDecoder.decode(playPath, "UTF-8");
+            playPath = URLDecoder.decode(playPath, StandardCharsets.UTF_8);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -489,20 +490,20 @@ public abstract class BasePlayerActivity extends BaseActivity implements JZPlaye
     public void onMultiWindowModeChanged(boolean isInMultiWindowMode, Configuration newConfig) {
         super.onMultiWindowModeChanged(isInMultiWindowMode, newConfig);
         if (isInMultiWindowMode)
-            player.goOnPlayOnResume();
+            Jzvd.goOnPlayOnResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        player.goOnPlayOnPause();
+        Jzvd.goOnPlayOnPause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         hideNavBar();
-        if (!inMultiWindow()) player.goOnPlayOnResume();
+        if (!inMultiWindow()) Jzvd.goOnPlayOnResume();
     }
 
     @Override
@@ -575,7 +576,7 @@ public abstract class BasePlayerActivity extends BaseActivity implements JZPlaye
     @Override
     public void finish() {
         if (null != videoPresenter) videoPresenter.detachView();
-        player.releaseAllVideos();
+        Jzvd.releaseAllVideos();
         super.finish();
     }
 
@@ -700,7 +701,7 @@ public abstract class BasePlayerActivity extends BaseActivity implements JZPlaye
             EventBus.getDefault().post(new Refresh(2));
         }
         player.releaseDanMu();
-        player.releaseAllVideos();
+        Jzvd.releaseAllVideos();
         player.danmakuView = null;
         if (danmuPresenter != null)
             danmuPresenter.detachView();

@@ -1,5 +1,11 @@
 package my.project.sakuraproject.main.week;
 
+import android.view.HapticFeedbackConstants;
+
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.viewpager.widget.ViewPager;
+
 import com.google.android.material.tabs.TabLayout;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -11,9 +17,6 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import my.project.sakuraproject.R;
 import my.project.sakuraproject.adapter.WeekFragmentAdapter;
@@ -40,8 +43,8 @@ public class WeekActivity extends BaseActivity<HomeContract.View, HomePresenter>
     ViewPager viewpager;
     private WeekFragmentAdapter adapter;
     private int week;
-    private String[] tabs = Utils.getArray(R.array.week_array);
-    private int[][] states = new int[][]{
+    private final String[] tabs = Utils.getArray(R.array.week_array);
+    private final int[][] states = new int[][]{
             new int[]{-android.R.attr.state_checked},
             new int[]{android.R.attr.state_checked}
     };
@@ -79,7 +82,10 @@ public class WeekActivity extends BaseActivity<HomeContract.View, HomePresenter>
         toolbar.setTitle(getResources().getString(R.string.app_sub_name));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(view -> finish());
+        toolbar.setNavigationOnClickListener(view -> {
+            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+            finish();
+        });
     }
 
     public void initSwipe() {

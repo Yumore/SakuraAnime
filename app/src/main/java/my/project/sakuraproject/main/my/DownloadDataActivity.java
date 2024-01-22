@@ -6,10 +6,17 @@ import android.os.Environment;
 import android.os.Handler;
 import android.text.Html;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
@@ -28,11 +35,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
 import my.project.sakuraproject.R;
 import my.project.sakuraproject.adapter.DownloadDataListAdapter;
@@ -59,7 +61,7 @@ public class DownloadDataActivity extends BaseActivity<DownloadDataContract.View
     private DownloadDataListAdapter adapter;
     private String downloadId;
     private String animeTitle;
-    private int limit = 10;
+    private final int limit = 10;
     private int downloadDataCount = 0;
     private boolean isMain = true;
     protected boolean isErr = true;
@@ -68,7 +70,7 @@ public class DownloadDataActivity extends BaseActivity<DownloadDataContract.View
     private static final String[] COMPLETE_STR = new String[]{"使用内置播放器播放", "使用外部播放器播放", "删除任务"};
     private static final String[] DOWNLOAD_ERROR_STR = new String[]{"尝试重新下载", "删除任务"};
     private File downloadDir;
-    private static final String DOWNLOAD_PATH = Environment.getExternalStorageDirectory() + "/SakuraAnime/Downloads/%s/%s/";;
+    private static final String DOWNLOAD_PATH = Environment.getExternalStorageDirectory() + "/SakuraAnime/Downloads/%s/%s/";
 
     @Override
     protected DownloadDataPresenter createPresenter() {
@@ -104,7 +106,10 @@ public class DownloadDataActivity extends BaseActivity<DownloadDataContract.View
         toolbar.setTitle(animeTitle);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(view -> finish());
+        toolbar.setNavigationOnClickListener(view -> {
+            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+            finish();
+        });
     }
 
     private void initSwipe() {

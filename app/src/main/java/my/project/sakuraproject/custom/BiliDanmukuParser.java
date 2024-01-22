@@ -16,6 +16,8 @@
 
 package my.project.sakuraproject.custom;
 
+import static master.flame.danmaku.danmaku.model.IDanmakus.ST_BY_TIME;
+
 import android.graphics.Color;
 import android.text.TextUtils;
 
@@ -36,14 +38,15 @@ import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.Duration;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.SpecialDanmaku;
+import master.flame.danmaku.danmaku.model.android.DanmakuFactory;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
-import master.flame.danmaku.danmaku.model.android.DanmakuFactory;
 import master.flame.danmaku.danmaku.parser.android.AndroidFileSource;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
-import static master.flame.danmaku.danmaku.model.IDanmakus.ST_BY_TIME;
-
+/**
+ * XML格式弹幕解析
+ */
 public class BiliDanmukuParser extends BaseDanmakuParser {
 
     static {
@@ -103,7 +106,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
 
         @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes)
-                throws SAXException {
+            throws SAXException {
             String tagName = localName.length() != 0 ? localName : qName;
             tagName = tagName.toLowerCase(Locale.getDefault()).trim();
             if (tagName.equals("d")) {
@@ -168,7 +171,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                 // initial specail danmaku data
                 String text = String.valueOf(item.text).trim();
                 if (item.getType() == BaseDanmaku.TYPE_SPECIAL && text.startsWith("[")
-                        && text.endsWith("]")) {
+                    && text.endsWith("]")) {
                     //text = text.substring(1, text.length() - 1);
                     String[] textArr = null;//text.split(",", -1);
                     try {
@@ -230,7 +233,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                     item.rotationZ = rotateZ;
                     item.rotationY = rotateY;
                     mContext.mDanmakuFactory.fillTranslationData(item, beginX,
-                            beginY, endX, endY, translationDuration, translationStartDelay, mDispScaleX, mDispScaleY);
+                        beginY, endX, endY, translationDuration, translationStartDelay, mDispScaleX, mDispScaleY);
                     mContext.mDanmakuFactory.fillAlphaData(item, beginAlpha, endAlpha, alphaDuraion);
 
                     if (textArr.length >= 12) {
@@ -261,8 +264,8 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
                                             points[i][1] = parseFloat(pointArray[1]);
                                         }
                                     }
-                                    mContext.mDanmakuFactory.fillLinePathData(item, points, mDispScaleX,
-                                            mDispScaleY);
+                                    DanmakuFactory.fillLinePathData(item, points, mDispScaleX,
+                                        mDispScaleY);
                                 }
                             }
                         }
@@ -310,7 +313,7 @@ public class BiliDanmukuParser extends BaseDanmakuParser {
             return 0;
         }
     }
-    
+
     private long parseLong(String longStr) {
         try {
             return Long.parseLong(longStr);

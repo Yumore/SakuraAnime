@@ -9,6 +9,7 @@ import static my.project.sakuraproject.config.SettingEnum.VIDEO_PLAYER_KERNEL;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Patterns;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -54,7 +55,7 @@ public class SettingActivity extends BaseActivity {
     TextView checkFavoriteUpdateTV;
     @BindView(R.id.download_number)
     TextView downloadNumberTV;
-    private String[] downloadNumbers = Utils.getArray(R.array.download_numbers);
+    private final String[] downloadNumbers = Utils.getArray(R.array.download_numbers);
     @BindView(R.id.show)
     CoordinatorLayout show;
     @BindView(R.id.danmu_select)
@@ -103,7 +104,10 @@ public class SettingActivity extends BaseActivity {
         toolbar.setTitle(Utils.getString(R.string.home_setting_item_title));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(view -> finish());
+        toolbar.setNavigationOnClickListener(view -> {
+            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+            finish();
+        });
     }
 
     public void initViews() {
@@ -125,7 +129,7 @@ public class SettingActivity extends BaseActivity {
         int setStartCheckUpdate = (Integer) SharedPreferencesUtils.getParam(this, "start_check_update", 0);
         checkUpdateDefaultTV.setText(CHECK_APP_UPDATE.getItems()[setStartCheckUpdate]);
         checkFavoriteUpdateTV.setText((Boolean) SharedPreferencesUtils.getParam(this, "check_favorite_update", true) ? CHECK_AMINE_UPDATE.getItems()[0] : CHECK_AMINE_UPDATE.getItems()[1]);
-        downloadNumberTV.setText(((Integer) SharedPreferencesUtils.getParam(this, "download_number", 0) + 1) + "");
+        downloadNumberTV.setText(String.valueOf((Integer) SharedPreferencesUtils.getParam(this, "download_number", 0) + 1));
         danmuSelectTV.setText((Boolean) SharedPreferencesUtils.getParam(this, "open_danmu", true) ? VIDEO_PLAYER_DANMU.getItems()[0] : VIDEO_PLAYER_DANMU.getItems()[1]);
     }
 
@@ -222,6 +226,7 @@ public class SettingActivity extends BaseActivity {
                     EventBus.getDefault().post(new Refresh(0));
 //                    application.showSuccessToastMsg(Utils.getString(R.string.set_domain_ok));
                     CustomToast.showToast(this, Utils.getString(R.string.set_domain_ok), CustomToast.SUCCESS);
+//                    application.showSnackbar(toolbar, Utils.getString(R.string.set_domain_ok));
                 } else textInputLayout.getEditText().setError(Utils.getString(R.string.set_domain_error2));
             } else textInputLayout.getEditText().setError(Utils.getString(R.string.set_domain_error1));
         });
@@ -336,6 +341,7 @@ public class SettingActivity extends BaseActivity {
                     Aria.download(this).removeAllTask(false);
                     DatabaseUtil.deleteAllDownloads();
                     CustomToast.showToast(this, "已删除所有下载记录", CustomToast.DEFAULT);
+//                    application.showSnackbar(toolbar, "已删除所有下载记录");
                     dialogInterface.dismiss();
                 },
                 (dialogInterface, i) -> dialogInterface.dismiss(),

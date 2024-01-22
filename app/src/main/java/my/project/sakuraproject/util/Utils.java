@@ -40,6 +40,16 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.ArrayRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AlertDialog;
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.FileProvider;
+import androidx.palette.graphics.Palette;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
@@ -65,20 +75,11 @@ import java.util.Formatter;
 import java.util.List;
 import java.util.Locale;
 
-import androidx.annotation.ArrayRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.appcompat.app.AlertDialog;
-import androidx.browser.customtabs.CustomTabsIntent;
-import androidx.cardview.widget.CardView;
-import androidx.core.content.FileProvider;
-import androidx.palette.graphics.Palette;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 import my.project.sakuraproject.BuildConfig;
 import my.project.sakuraproject.R;
+import my.project.sakuraproject.application.Sakura;
 import my.project.sakuraproject.bean.UpdateImgBean;
-import my.project.sakuraproject.custom.CustomToast;
 import my.project.sakuraproject.main.base.BaseModel;
 import my.project.sakuraproject.main.my.MyActivity;
 import my.project.sakuraproject.sniffing.SniffingVideo;
@@ -189,8 +190,8 @@ public class Utils {
         try {
             context.startActivity(Intent.createChooser(intent, "请选择视频播放器"));
         } catch (ActivityNotFoundException e) {
-//            Sakura.getInstance().showToastMsg("没有找到匹配的程序");
-            CustomToast.showToast(getContext(), "没有找到匹配的程序", CustomToast.WARNING);
+            Sakura.getInstance().showToastMsg("没有找到匹配的程序");
+//            CustomToast.showToast(getContext(), "没有找到匹配的程序", CustomToast.WARNING);
         }
     }
 
@@ -207,7 +208,8 @@ public class Utils {
         try {
             context.startActivity(Intent.createChooser(intent, "请选择相关软件进行操作"));
         } catch (ActivityNotFoundException e) {
-            CustomToast.showToast(getContext(), "没有找到匹配的程序", CustomToast.WARNING);
+            Sakura.getInstance().showToastMsg("没有找到匹配的程序");
+//            CustomToast.showToast(getContext(), "没有找到匹配的程序", CustomToast.WARNING);
         }
     }
 
@@ -224,8 +226,8 @@ public class Utils {
         if (intent.resolveActivity(context.getPackageManager()) != null) {
             context.startActivity(Intent.createChooser(intent, "请通过浏览器打开"));
         } else {
-//            Sakura.getInstance().showToastMsg("没有找到匹配的程序");
-            CustomToast.showToast(getContext(), "没有找到匹配的程序", CustomToast.WARNING);
+            Sakura.getInstance().showToastMsg("没有找到匹配的程序");
+//            CustomToast.showToast(getContext(), "没有找到匹配的程序", CustomToast.WARNING);
         }
     }
 
@@ -578,7 +580,7 @@ public class Utils {
      * @param root
      */
     public static void deleteAllFiles(File root) {
-        File files[] = root.listFiles();
+        File[] files = root.listFiles();
         if (files != null)
             for (File f : files) {
                 if (f.isDirectory()) { // 判断是否为文件夹
@@ -684,7 +686,7 @@ public class Utils {
         if (resourceId > 0 && checkHasNavigationBar(activity)) {
             result = resources.getDimensionPixelSize(resourceId);
         }
-        Log.e("getNavigationBarHeight", result + "");
+        Log.e("getNavigationBarHeight", String.valueOf(result));
         return result + 15;
     }
 
@@ -874,10 +876,7 @@ public class Utils {
         ConnectivityManager connectivityManager =(ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo =connectivityManager.getActiveNetworkInfo();
-        if (activeNetworkInfo != null &&activeNetworkInfo.getType() == connectivityManager.TYPE_WIFI){
-            return true;
-        }
-        return false;
+        return activeNetworkInfo != null && activeNetworkInfo.getType() == ConnectivityManager.TYPE_WIFI;
     }
     /**
      * 将ip的整数形式转换成ip形式
@@ -886,12 +885,11 @@ public class Utils {
      * @return
      */
     public static String int2ip(int ipInt) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(ipInt & 0xFF).append(".");
-        sb.append((ipInt >> 8) & 0xFF).append(".");
-        sb.append((ipInt >> 16) & 0xFF).append(".");
-        sb.append((ipInt >> 24) & 0xFF);
-        return sb.toString();
+        String sb = (ipInt & 0xFF) + "." +
+            ((ipInt >> 8) & 0xFF) + "." +
+            ((ipInt >> 16) & 0xFF) + "." +
+            ((ipInt >> 24) & 0xFF);
+        return sb;
     }
 
     /**
@@ -1026,5 +1024,13 @@ public class Utils {
         builder.setCancelable(cancelable);
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+    public static boolean isNullOrEmpty(String str) {
+        return str == null || str.isEmpty();
+    }
+
+    public static boolean isNullOrEmpty(Object obj) {
+        return obj == null;
     }
 }
